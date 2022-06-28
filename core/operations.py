@@ -1,0 +1,42 @@
+from enum import Enum, auto
+
+
+class PrimOp(Enum):
+    AddOp = auto()
+    AddModOp = auto()
+    SubOp = auto()
+    SubModOp = auto()
+    TimesOp = auto()
+    DivideOp = auto()
+    ModOp = auto()
+    ShiftLeftOp = auto()
+    ShiftRightOp = auto()
+    DynamicShiftLeftOp = auto()
+    DynamicShiftRightOp = auto()
+    AndOp = auto()
+    OrOp = auto()
+    BitAndOp = auto()
+    BitOrOp = auto()
+    BitXorOp = auto()
+    BitNotOp = auto()
+    NotOp = auto()
+    ConcatOp = auto()
+    BitSelectOp = auto()
+    BitsExtractOp = auto()
+    LessOp = auto()
+    LessEqOp = auto()
+    GreaterOp = auto()
+    GreaterEqOp = auto()
+    EqualOp = auto()
+    PatternEqualOp = auto()
+    PadOp = auto()
+    NotEqualOp = auto()
+    NegOp = auto()
+    MultiplexOp = auto()
+    AndReduceOp = auto()
+    OrReduceOp = auto()
+    XorReduceOp = auto()
+
+
+if __name__ == '__main__':
+    print(list(PrimOp))
