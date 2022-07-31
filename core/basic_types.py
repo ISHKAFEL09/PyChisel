@@ -1,6 +1,6 @@
 import abc
 
-from core.inner_struct import get_ref_id, Alias
+from core.inner_struct import getRefID, Alias
 from core.operations import PrimOp
 
 
@@ -8,8 +8,7 @@ class Width:
     ...
 
 
-class UnknownWidth(Width):
-    ...
+UnknownWidth = Width()
 
 
 class IntWidth(Width):
@@ -18,8 +17,8 @@ class IntWidth(Width):
 
 
 class Kind:
-    def __init__(self, is_flip: bool):
-        self.is_flip = is_flip
+    def __init__(self, isFlip: bool):
+        self.isFlip = isFlip
 
 
 class UnknownType(Kind):
@@ -72,16 +71,16 @@ class Direction:
 
 INPUT = Direction('input')
 OUTPUT = Direction('output')
-NO_IDR = Direction('?')
+NO_DIR = Direction('?')
 
 
-def flip_direction(direction: Direction) -> Direction:
+def flipDirection(direction: Direction) -> Direction:
     if direction is INPUT:
         return OUTPUT
     elif direction is OUTPUT:
         return INPUT
-    elif NO_IDR:
-        return NO_IDR
+    elif NO_DIR:
+        return NO_DIR
     else:
         raise ValueError(f'Unknown direction: {direction}')
 
@@ -107,7 +106,7 @@ class Definition(Command, abc.ABC):
 
     @property
     def name(self) -> str:
-        return get_ref_id(self.idx).name
+        return getRefID(self.idx).name
 
 
 class DefUInt(Definition):
@@ -251,6 +250,6 @@ if __name__ == '__main__':
     uint = DefSInt('sint', 0, 3)
     print(uint.value, uint.idx, uint.width, uint.name)
 
-    print(INPUT, OUTPUT, NO_IDR)
+    print(INPUT, OUTPUT, NO_DIR)
 
-    print(flip_direction(INPUT))
+    print(flipDirection(INPUT))

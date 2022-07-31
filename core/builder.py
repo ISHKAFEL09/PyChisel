@@ -1,74 +1,74 @@
 import collections.abc
 from collections import deque
 from core.basic_types import *
-from core.inner_struct import gen_sys
+from core.inner_struct import genSys
 from typing import Callable
 
 
 components: list[Component] = list()
 
-scope_stack: deque[set[str]] = deque()
+scopeStack: deque[set[str]] = deque()
 
-switch_keys_stack: deque[deque['Bits']] = deque()
+switchKeysStack: deque[deque['_Bits']] = deque()
 
 modules: collections.abc.MutableMapping[str, 'Module'] = dict()
 
-module_stack: deque['Module'] = deque()
+moduleStack: deque['Module'] = deque()
 
-component_names: set[str] = set()
+componentNames: set[str] = set()
 
-command_stack: deque[list[Command]] = deque()
+commandStack: deque[list[Command]] = deque()
 
 
 def scope() -> set[str]:
-    return scope_stack[-1]
+    return scopeStack[-1]
 
 
-def switch_keys() -> deque['Bits']:
-    return switch_keys_stack[-1]
+def switchKeys() -> deque['_Bits']:
+    return switchKeysStack[-1]
 
 
-def push_scope() -> None:
-    scope_stack.append(set())
-    switch_keys_stack.append(deque())
+def pushScope() -> None:
+    scopeStack.append(set())
+    switchKeysStack.append(deque())
 
 
-def pop_scope() -> None:
-    scope_stack.pop()
-    switch_keys_stack.pop()
+def popScope() -> None:
+    scopeStack.pop()
+    switchKeysStack.pop()
 
 
-def add_module(mod: 'Module') -> None:
+def addModule(mod: 'Module') -> None:
     modules[mod.id] = mod
 
 
-def push_module(mod: 'Module') -> None:
-    module_stack.append(mod)
+def pushModule(mod: 'Module') -> None:
+    moduleStack.append(mod)
 
 
-def get_component() -> 'Module':
-    return module_stack[0]
+def getComponent() -> 'Module':
+    return moduleStack[0]
 
 
-def pop_module() -> None:
-    module_stack.pop()
+def popModule() -> None:
+    moduleStack.pop()
 
 
-def unique_component(name: str, ports: list[Port], body: Command) -> Component:
-    ret = Component(gen_sys(name) if name in component_names else name, ports, body)
-    component_names.add(name)
+def uniqueComponent(name: str, ports: list[Port], body: Command) -> Component:
+    ret = Component(genSys(name) if name in componentNames else name, ports, body)
+    componentNames.add(name)
     return ret
 
 
 def commands() -> list[Command]:
-    return command_stack[-1]
+    return commandStack[-1]
 
 
-def push_command(cmd: Command) -> None:
+def pushCommand(cmd: Command) -> None:
     commands().append(cmd)
 
 
-def to_command(cmds: list[Command]) -> Command:
+def toCommand(cmds: list[Command]) -> Command:
     match (len(cmds)):
         case 0:
             return EmptyCommand()
@@ -78,29 +78,29 @@ def to_command(cmds: list[Command]) -> Command:
             return Begin(cmds)
 
 
-def push_commands() -> None:
-    command_stack.append(list())
+def pushCommands() -> None:
+    commandStack.append(list())
 
 
-def pop_commands() -> Command:
-    return to_command(command_stack.pop())
+def popCommands() -> Command:
+    return toCommand(commandStack.pop())
 
 
-def collect_commands(f: Callable[[], 'Module']) -> tuple[Command, 'Module']:
-    push_commands()
+def collectCommands(f: Callable[[], 'Module']) -> tuple[Command, 'Module']:
+    pushCommands()
     ret = f()
-    return pop_commands(), ret
+    return popCommands(), ret
 
 
 def build(f: Callable[[], 'Module']) -> tuple[Circuit, 'Module']:
-    _, mod = collect_commands(f)
+    _, mod = collectCommands(f)
     return Circuit(components, components[-1].name), mod
 
 
 if __name__ == '__main__':
-    print(gen_sys('id'))
-    print(gen_sys('T'))
-    scope_stack.extend([set('a'), set('b'), set('c')])
+    print(genSys('id'))
+    print(genSys('T'))
+    scopeStack.extend([set('a'), set('b'), set('c')])
     print(scope())
-    print(scope_stack.pop())
-    print(scope_stack.pop())
+    print(scopeStack.pop())
+    print(scopeStack.pop())

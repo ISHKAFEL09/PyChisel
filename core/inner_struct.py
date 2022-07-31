@@ -2,23 +2,23 @@ import abc
 from collections import abc as collect_abc
 
 
-_ref_map: collect_abc.MutableMapping[str, 'Immediate'] = dict()
+_refMap: collect_abc.MutableMapping[str, 'Immediate'] = dict()
 
 
-def __gen_sys():
-    def __inner_gen_sys():
+def _genSys():
+    def _innerGenSys():
         counter = -1
         cname = ''
         while True:
             name = yield cname
             counter += 1
             cname = f'{name}_{counter}'
-    tmp = __inner_gen_sys()
+    tmp = _innerGenSys()
     next(tmp)
     return tmp
 
 
-gen_sys = __gen_sys().send
+genSys = _genSys().send
 
 
 class Immediate(abc.ABC):
@@ -39,38 +39,38 @@ class Alias(Immediate):
 
     @property
     def fullname(self) -> str:
-        return get_ref_id(self.idx).fullname
+        return getRefID(self.idx).fullname
 
     @property
     def name(self) -> str:
-        return get_ref_id(self.idx).name
+        return getRefID(self.idx).name
 
 
 class Ref(Immediate):
     def __init__(self, name: str):
-        self._name = name
+        self.Name = name
 
     @property
     def fullname(self) -> str:
-        return self._name
+        return self.Name
 
     @property
     def name(self) -> str:
-        return self._name
+        return self.Name
 
 
 class Slot(Immediate):
     def __init__(self, imm: Immediate, name: str):
         self.imm = imm
-        self._name = name
+        self.Name = name
 
     @property
     def fullname(self) -> str:
-        return self._name if self.imm.fullname == 'self' else f'{self.imm.fullname}.{self._name}'
+        return self.Name if self.imm.fullname == 'self' else f'{self.imm.fullname}.{self.Name}'
 
     @property
     def name(self) -> str:
-        return self._name
+        return self.Name
 
 
 class Index(Immediate):
@@ -87,23 +87,23 @@ class Index(Immediate):
         return f'{self.imm.fullname}.{self.value}'
 
 
-def set_ref_id(idx: str, name: str, overwrite: bool) -> None:
-    if overwrite or idx not in _ref_map:
-        _ref_map[idx] = Ref(name)
+def setRefID(idx: str, name: str, overwrite: bool) -> None:
+    if overwrite or idx not in _refMap:
+        _refMap[idx] = Ref(name)
 
 
-def set_field_id(parent_id: str, idx: str, name: str) -> None:
-    _ref_map[idx] = Slot(Alias(parent_id), name)
+def setFieldID(parent_id: str, idx: str, name: str) -> None:
+    _refMap[idx] = Slot(Alias(parent_id), name)
 
 
-def set_index_id(parent_id: str, idx: str, index: int) -> None:
-    _ref_map[idx] = Index(Alias(parent_id), index)
+def setIndexID(parent_id: str, idx: str, index: int) -> None:
+    _refMap[idx] = Index(Alias(parent_id), index)
 
 
-def get_ref_id(idx: str) -> Immediate:
-    if idx in _ref_map:
-        return _ref_map[idx]
+def getRefID(idx: str) -> Immediate:
+    if idx in _refMap:
+        return _refMap[idx]
     else:
-        ref = Ref(gen_sys('T'))
-        _ref_map[idx] = ref
+        ref = Ref(genSys('T'))
+        _refMap[idx] = ref
         return ref
